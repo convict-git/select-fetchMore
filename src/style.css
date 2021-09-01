@@ -1,15 +1,29 @@
+@import url('https://fonts.googleapis.com/css2?family=Lato&display=swap');
+
 /* reset CSS */
-* {
+
+*,
+*::after,
+*::before {
   box-sizing: border-box;
   background-color: blanchedalmond;
   padding: 0;
   margin: 0;
+  font-size: large;
 }
 
 .window {
-  height: 200px;
-  width: 200px;
+  height: 300px;
+  width: 400px;
   padding: 20px;
   border: 2px solid black;
+  border-radius: 20px;
   overflow: scroll;
+  margin: 100px auto;
+}
+
+.window ul {
+  font-size: 5em;
+  font-family: 'Lato', sans-serif;
+  list-style-type: none;
 }

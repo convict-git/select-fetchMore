@@ -2,7 +2,8 @@ import { useQueryGetCityList } from '../gql/gqlOperations';
 import React from 'react';
 
 const Window = (): JSX.Element => {
-  const { data, loading, error, loadMore } = useQueryGetCityList();
+  const { data, loading, error, loadMore, isFetchingMore } =
+    useQueryGetCityList();
 
   if (error) {
     return <div>Error caught: {error.message}</div>;
@@ -10,7 +11,7 @@ const Window = (): JSX.Element => {
 
   const onScrollHandler = (e: any) => {
     if (
-      e.target.offsetHeight + e.target.scrollTop + 200 >=
+      e.target.offsetHeight + e.target.scrollTop + 400 >=
       e.target.scrollHeight
     ) {
       loadMore();
@@ -19,15 +20,17 @@ const Window = (): JSX.Element => {
 
   return (
     <React.Fragment>
-      <div className="loader">{loading ? 'Loading...' : 'Done'}</div>
       <div className="window" onScroll={onScrollHandler}>
         <ul>
           {data?.map((city) => (
             <li key={`${city.lat},${city.lng}`}>
-              {city.name} {city.country}
+              {city.name}, {city.country}
             </li>
           ))}
         </ul>
+        <code className="loader">
+          {loading || isFetchingMore ? 'Loading...' : ''}
+        </code>
       </div>
     </React.Fragment>
   );

@@ -26,25 +26,27 @@ interface ResultType {
   getCities: CityType[];
 }
 
-const LIST_FETCH_SIZE = 10;
+const LIST_FETCH_SIZE = 20;
 
 const useQueryGetCityList = () => {
-  const [limit, setLimit] = React.useState<number>(LIST_FETCH_SIZE);
+  const [length, setLength] = React.useState<number>(0);
+  const [isFetchingMore, setIsFetchingMore] = React.useState<boolean>(false);
+
   const { loading, data, error, fetchMore } = useQuery<ResultType>(
     GET_CITY_LIST,
     {
       variables: {
         input: {
           offset: 0,
-          limit,
+          limit: length + LIST_FETCH_SIZE,
         },
       },
     }
   );
 
   const loadMore = () => {
-    console.log('loadMore Called()');
-    if (data) {
+    if (data && !isFetchingMore) {
+      setIsFetchingMore(true);
       const currentLength = data.getCities.length;
       fetchMore({
         variables: {
@@ -52,12 +54,13 @@ const useQueryGetCityList = () => {
           limit: LIST_FETCH_SIZE,
         },
       }).then((fetchMoreResult) => {
-        setLimit(currentLength + fetchMoreResult.data.getCities.length);
+        setLength(currentLength + fetchMoreResult.data.getCities.length);
+        setIsFetchingMore(false);
       });
     }
   };
 
-  return { data: data?.getCities, loading, error, loadMore };
+  return { data: data?.getCities, loading, error, loadMore, isFetchingMore };
 };
 
 export { GET_CITY_LIST, useQueryGetCityList };
