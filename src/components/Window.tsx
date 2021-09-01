@@ -1,4 +1,4 @@
-import { useQueryGetCityList } from '../gql/gqlOperations';
+import { useQueryGetCityList } from '../gql/useQueryGetCityList';
 import React from 'react';
 
 const Window = (): JSX.Element => {
