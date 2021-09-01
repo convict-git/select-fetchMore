@@ -1,7 +1,7 @@
-import React from 'react';
+import { Window } from './Window';
 
 const Main = (): JSX.Element => {
-  return <React.Fragment></React.Fragment>;
+  return <Window />;
 };
 
 export { Main };

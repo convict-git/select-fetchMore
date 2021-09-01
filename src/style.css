@@ -1,9 +1,15 @@
+/* reset CSS */
 * {
+  box-sizing: border-box;
   background-color: blanchedalmond;
-  padding: 2px;
-  margin: 5px;
+  padding: 0;
+  margin: 0;
 }
-img {
+
+.window {
   height: 200px;
   width: 200px;
+  padding: 20px;
+  border: 2px solid black;
+  overflow: scroll;
 }
