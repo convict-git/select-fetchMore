@@ -3,13 +3,16 @@ const createCityModel = (db) => {
   return {
     get({ offset, limit }) {
       console.log(
-        `[INFO]: Queries for getCities | offset: {${offset}}, limit: {${limit}} | `
+        `[INFO: ${new Date().toLocaleTimeString()}]: Queries for getCities | offset: {${offset}}, limit: {${limit}} | `
       );
       if (offset >= db.length) {
         console.warn(
           `[WARN]: offset exceeding the length | offset: {${offset}} total cities: {${db.length}} | `
         );
-        return [];
+        return {
+          data: [],
+          hasMore: false,
+        };
       }
       if (offset + limit >= db.length) {
         console.warn(
@@ -17,7 +20,10 @@ const createCityModel = (db) => {
         );
         limit = db.length - offset;
       }
-      return db.slice(offset, offset + limit);
+      return {
+        data: db.slice(offset, offset + limit),
+        hasMore: !(offset + limit === db.length),
+      };
     },
   };
 };

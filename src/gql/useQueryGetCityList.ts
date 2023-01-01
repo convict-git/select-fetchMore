@@ -1,15 +1,18 @@
-import React from 'react';
+import { useCallback, useRef } from 'react';
 import { gql } from 'graphql-tag';
-import { useQuery } from '@apollo/client';
+import { useQuery, NetworkStatus } from '@apollo/client';
 
 const GET_CITY_LIST = gql`
   query GetCityList($input: GetCityInput) {
     getCities(input: $input) {
-      id
-      name
-      country
-      lat
-      lng
+      data {
+        id
+        name
+        country
+        lat
+        lng
+      }
+      hasMore
     }
   }
 `;
@@ -23,44 +26,80 @@ interface CityType {
 }
 
 interface ResultType {
-  getCities: CityType[];
+  getCities: {
+    data: CityType[];
+    hasMore: boolean;
+  };
 }
 
 const LIST_FETCH_SIZE = 20;
 
 const useQueryGetCityList = () => {
-  const [length, setLength] = React.useState<number>(0);
-  const [isFetchingMore, setIsFetchingMore] = React.useState<boolean>(false);
-
-  const { loading, data, error, fetchMore } = useQuery<ResultType>(
-    GET_CITY_LIST,
-    {
-      variables: {
-        input: {
-          offset: 0,
-          limit: length + LIST_FETCH_SIZE,
-        },
+  const {
+    loading,
+    data,
+    error,
+    fetchMore: _fetchMore,
+    networkStatus,
+  } = useQuery<ResultType>(GET_CITY_LIST, {
+    variables: {
+      input: {
+        offset: 0,
+        limit: LIST_FETCH_SIZE,
       },
-    }
-  );
+    },
+  });
 
-  const loadMore = () => {
-    if (data && !isFetchingMore) {
-      setIsFetchingMore(true);
-      const currentLength = data.getCities.length;
-      fetchMore({
+  const isFetchingMore = networkStatus === NetworkStatus.fetchMore;
+  const lastCurrentLengthRef = useRef(0);
+
+  const fetchMore = useCallback(() => {
+    const currentLength = data?.getCities?.data?.length ?? 0;
+    if (
+      data &&
+      data?.getCities.hasMore &&
+      !isFetchingMore &&
+      !loading &&
+      lastCurrentLengthRef.current !== currentLength
+    ) {
+      lastCurrentLengthRef.current = currentLength;
+      _fetchMore({
         variables: {
-          offset: currentLength,
-          limit: LIST_FETCH_SIZE,
+          input: {
+            offset: currentLength,
+            limit: LIST_FETCH_SIZE,
+          },
         },
-      }).then((fetchMoreResult) => {
-        setLength(currentLength + fetchMoreResult.data.getCities.length);
-        setIsFetchingMore(false);
+        updateQuery: (previousQueryResult, { fetchMoreResult }) => {
+          return {
+            ...previousQueryResult,
+            getCities: {
+              data:
+                fetchMoreResult?.getCities?.data &&
+                previousQueryResult.getCities?.data
+                  ? [
+                      ...previousQueryResult.getCities.data,
+                      ...fetchMoreResult.getCities.data,
+                    ]
+                  : previousQueryResult.getCities,
+              hasMore: !!(
+                fetchMoreResult?.getCities?.hasMore ||
+                fetchMoreResult.getCities?.hasMore
+              ),
+            },
+          };
+        },
       });
     }
-  };
+  }, [data, _fetchMore, isFetchingMore]);
 
-  return { data: data?.getCities, loading, error, loadMore, isFetchingMore };
+  return {
+    data: data?.getCities.data,
+    loading,
+    error,
+    fetchMore,
+    isFetchingMore,
+  };
 };
 
 export { GET_CITY_LIST, useQueryGetCityList };

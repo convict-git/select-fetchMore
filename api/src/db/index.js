@@ -1,9 +1,12 @@
 const { city: db } = require('./cityDB');
 const createCityModel = require('./city');
 
+const dbSliced = db.slice(0, 100);
+console.log(dbSliced.length);
+
 module.exports = {
   models: {
-    City: createCityModel(db),
+    City: createCityModel(dbSliced),
   },
-  db,
+  db: dbSliced,
 };
