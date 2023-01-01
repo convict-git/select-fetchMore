@@ -13,9 +13,14 @@ const typeDefs = gql`
     offset: Int!
     limit: Int!
   }
+  
+  type GetCitiesResponse {
+    data: [City]
+    hasMore: Boolean!
+  }
 
   type Query {
-    getCities(input: GetCityInput): [City]!
+    getCities(input: GetCityInput): GetCitiesResponse
   }
 `;
 

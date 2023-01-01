@@ -2,7 +2,7 @@ import { useQueryGetCityList } from '../gql/useQueryGetCityList';
 import React from 'react';
 
 const Window = (): JSX.Element => {
-  const { data, loading, error, loadMore, isFetchingMore } =
+  const { data, loading, error, fetchMore, isFetchingMore } =
     useQueryGetCityList();
 
   if (error) {
@@ -14,7 +14,7 @@ const Window = (): JSX.Element => {
       e.target.offsetHeight + e.target.scrollTop + 400 >=
       e.target.scrollHeight
     ) {
-      loadMore();
+      fetchMore();
     }
   };
 
